@@ -1,0 +1,2 @@
+export(ecipex)
+importFrom(CHNOSZ,count.elements)
