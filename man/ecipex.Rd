@@ -2,8 +2,8 @@
 \alias{ecipex}
 \title{Calculate fine structure isotope pattern}
 \usage{
-  ecipex(formulas, isoinfo = nistiso, limit = 1e-12,
-    id = FALSE, sortby = "abundance")
+  ecipex(formulas, isoinfo = ecipex::nistiso, limit = 1e-12,
+    id = FALSE, sortby = "abundance", gross = FALSE, groupby = "mass")
 }
 \arguments{
   \item{formulas}{a character vector specifying the
@@ -20,16 +20,32 @@
   \code{\link{nistiso}}.}
 
   \item{limit}{isotopologues with abundances below this
-  value are not calculated.}
+  value are ignored.}
 
   \item{id}{determines whether the full isotopic
   composition of each isotopic variant should be specified
   in the output. Setting this to \code{TRUE} can increase
-  memory requirements substantially.}
+  memory requirements substantially. This argument has no
+  effect if \code{gross} is set to \code{TRUE}.}
 
   \item{sortby}{should be one of \code{"abundance"} or
   \code{"mass"}, depending on whether the output should be
   sorted by abundance (high to low) or mass (low to high).}
+
+  \item{gross}{if \code{TRUE} the gross isotope
+  patterns will be returned instead of the fine structure ones.
+  }
+
+  \item{groupby}{determines how the fine structure
+  isotope patterns are grouped together when the gross structure
+  isotope patterns are calculated. If it is equal to \code{"mass"}
+  then isotopologues whose masses get rounded to the same integer number are 
+  grouped together. If it is equal to \code{"nucleons"} then 
+  isotopologues with the same number of nucleons get grouped 
+  together.  This argument is only used if \code{gross} 
+  is set to \code{TRUE}.
+
+  }
 }
 \value{
   A list of data frames containing the fine structure
@@ -38,16 +54,18 @@
   isotope pattern of any given formula is easily extracted.
   If \code{id} is set to \code{TRUE}, the output will
   include additional columns listing the counts of each
-  distinct isotope of each element.
+  distinct isotope of each element. If \code{gross}
+  is set to \code{TRUE}, the output will instead contain the
+  gross structure isotope patterns of each formula in \code{formulas}.
 }
 \description{
-  This function calculates the exact fine structure isotope
-  pattern for a given set of chemical formulas. It returns
-  the isotope patterns as a list of data frames which may
-  be sorted by mass or abundance.
+  This function can calculate either the fine structure isotope
+  patterns or the gross structure isotope patterns for a given set 
+  of chemical formulas. It returns the isotope patterns as a list 
+  of data frames which may be sorted by mass or abundance.
 }
 \details{
-  The isotope pattern of each formula is calculated by
+  The fine structure isotope pattern of each formula is calculated by
   applying the multi-dimensional fast Fourier transform to
   a simplex-based representation of each element's isotopic
   abundance. The algorithm is most efficient when the atom
@@ -58,7 +76,13 @@
   \code{limit} below its default value, as this can
   increase memory requirements significantly and is
   unlikely to provide information of any value, since the
-  natural isotopic abundances can be quite variable.
+  natural isotopic abundances can be quite variable. If \code{gross} 
+  is set to \code{TRUE} then the gross structure isotope patterns 
+  are calculated directly from the fine structure isotope patterns.
+  Note that for centroids with extremely low abundances (say less than
+  one billionth of the total) the centroided masses
+  can be somewhat inaccurate due to floating point errors.
+  
 }
 \examples{
 # a simple molecule
@@ -107,6 +131,9 @@ iso_C60_reallyComplete <- ecipex("C60", limit= -1)[[1]]
 # the latter includes negative isotopic abundances because the floating point errors are orders of 
 # magnitude greater than the "true" abundances. The variations in natural isotopic abundances will
 # typically be much greater than floating point errors.
+
+# calculate the gross structure isotope pattern, grouping the fine structure isotopologues by mass
+ecipex("C6H14N4O2", sortby="mass", gross=TRUE, groupby="mass")
 }
 \references{
 Ipsen, A., Efficient Calculation of Exact Fine Structure Isotope Patterns via the Multidimensional Fourier Transform, Anal. Chem., 2014, 86 (11), pp 5316-5322

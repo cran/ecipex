@@ -1,7 +1,12 @@
 
-ecipex<-function(formulas, isoinfo=nistiso, limit=1e-12, id=FALSE, sortby="abundance"){
+ecipex<-function(formulas, isoinfo=ecipex::nistiso, limit=1e-12, id=FALSE, sortby="abundance", gross=FALSE, groupby="mass"){
 
 sortby<-match.arg(sortby, c("abundance", "mass"))
+groupby<-match.arg(groupby, c("nucleons", "mass"))
+
+if(gross & (groupby=="nucleons")){
+  id <- TRUE
+}
 
 # determine which elements are present in each molecule and the corresponding copy number
 elementCount <- lapply(formulas, CHNOSZ::count.elements)
@@ -160,10 +165,12 @@ fullIsos<-lapply(seq(formulas), function(x){
 		moleculeAbundance<-moleculeAbundance[keepers]		
 
 		if(id){
-
-			moleculeSpecies<-cbind(matrix(moleculeSpecies[keepers[,1],], ncol=ncol(moleculeSpecies), dimnames=list(NULL, colnames(moleculeSpecies))), matrix(pureIsos[[elementList[[x]][i]]]$isoSpecies[[copyList[[x]][i]]][keepers[,2],], ncol=ncol(pureIsos[[elementList[[x]][i]]]$isoSpecies[[copyList[[x]][i]]]), dimnames=list(NULL, colnames(pureIsos[[elementList[[x]][i]]]$isoSpecies[[copyList[[x]][i]]]))))
-				
-			}		
+			if(length(keepers)==0){
+				return(NULL)
+			}else{
+				moleculeSpecies<-cbind(matrix(moleculeSpecies[keepers[,1],], ncol=ncol(moleculeSpecies), dimnames=list(NULL, colnames(moleculeSpecies))), matrix(pureIsos[[elementList[[x]][i]]]$isoSpecies[[copyList[[x]][i]]][keepers[,2],], ncol=ncol(pureIsos[[elementList[[x]][i]]]$isoSpecies[[copyList[[x]][i]]]), dimnames=list(NULL, colnames(pureIsos[[elementList[[x]][i]]]$isoSpecies[[copyList[[x]][i]]]))))
+			}				
+		}		
 		i<-i+1
 	}
 	
@@ -185,5 +192,52 @@ fullIsos<-lapply(seq(formulas), function(x){
 })
 names(fullIsos)<-formulas
 
-return(fullIsos)	
+if(!gross){
+  
+  return(fullIsos)	
+  
+}else{
+  fullGrossIsos <- lapply(fullIsos, function(fineIso){
+    
+    nuclNamesAll<-paste(isoinfo$nucleons,isoinfo$element, sep="")
+    
+    if(groupby=="nucleons"){
+      nuclNamesSub<-colnames(fineIso)[-c(1,2)]
+      nuclCount<-isoinfo$nucleons[match(nuclNamesSub, nuclNamesAll)]
+      isoNuclCount<-apply(t(t((fineIso[,-c(1,2)]))*(nuclCount)), 1, sum)
+      groupDex <- isoNuclCount
+    }else{
+      groupDex <- round(fineIso$mass)
+    }
+    
+    centroids<-by(data = fineIso, INDICES = groupDex, function(x){
+      centreAbnc<-sum(x$abundance)
+      centreMass<-sum(x$abundance*x$mass)/centreAbnc
+      return(c(centreMass, centreAbnc))
+    })
+    
+    centroidMat<-cbind(matrix(unlist(centroids), ncol=2, byrow=TRUE), as.integer(names(centroids)))
+    if(groupby=="nucleons"){
+      colnames(centroidMat)=c("centroidMass", "abundance", "nucleonCount")
+    }else if(groupby=="mass"){
+      colnames(centroidMat)=c("centroidMass", "abundance", "integerMass")
+    }
+
+    if(sortby=="abundance"){
+      centreDex<-order(centroidMat[,"abundance"], decreasing=TRUE)
+    }
+    if(sortby=="mass"){
+      massToSortBy <- centroidMat[,'centroidMass']
+      if(any(is.nan(massToSortBy))){
+        massToSortBy[is.nan(massToSortBy)] <- centroidMat[is.nan(massToSortBy),3]
+      }
+      centreDex<-order(massToSortBy, decreasing=FALSE)
+    } 		   	    		
+    
+    return(data.frame(centroidMat[centreDex,,drop=FALSE]))
+  })
+  
+  return(fullGrossIsos)
+}
+
 }
