@@ -10,7 +10,7 @@
   chemical formulas whose isotope patterns are to be
   calculated. The elements specified must be present in
   \code{isoinfo} and must be compatible with
-  \code{\link{count.elements}}.}
+  \code{\link[CHNOSZ:count.elements]{count.elements}}.}
 
   \item{isoinfo}{a data frame that specifies the masses and
   isotopic abundances of the elements to be used in the

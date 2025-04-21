@@ -1,7 +1,7 @@
-5261a8238065ba388610daad1dcf0c04 *DESCRIPTION
+e116dee0d3d9717fb69ea58cbf7766b9 *DESCRIPTION
 15940a6ebbfc8658813d9180b0411ab0 *NAMESPACE
 03c61b85527dc50db3acb13c19735bfe *R/ecipex.R
 819e52619964ef803d7bb55b499c62e9 *data/nistiso.rda
-09155f6f27f5c047b0060c7229888b36 *man/ecipex-package.Rd
-ba8d5b7426f146fd4c0ac0cd40b79d5f *man/ecipex.Rd
-8c15c68a748a1c5376a03ffc2e8dbc99 *man/nistiso.Rd
+5b7d1da82a0f1b87fe1e9287c52773ae *man/ecipex-package.Rd
+bcdedbf19bb4b4312fbacbc0dbdd276d *man/ecipex.Rd
+30d847658e2ab885ae3895be38ca45b2 *man/nistiso.Rd

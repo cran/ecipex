@@ -12,7 +12,7 @@
 }
 \details{
   \tabular{ll}{ Package: \tab ecipex\cr Type: \tab
-  Package\cr Version: \tab 1.1\cr Date: \tab 2020-03-12\cr
+  Package\cr Version: \tab 1.1.1\cr Date: \tab 2025-04-21\cr
   License: \tab GPL (>= 2)\cr LazyLoad: \tab true\cr }
 }
 \author{

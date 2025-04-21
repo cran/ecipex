@@ -14,7 +14,7 @@
   one row.
 }
 \references{
-  \url{http://www.nist.gov/pml/data/comp.cfm}
+  \url{https://www.nist.gov/pml/atomic-weights-and-isotopic-compositions-relative-atomic-masses}
 }
 \keyword{data}
 \keyword{datasets}
